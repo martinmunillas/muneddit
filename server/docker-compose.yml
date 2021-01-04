@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    environment:
+      POSTGRES_HOST: 'postgresdb'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'admin'
+      POSTGRES_NAME: 'muneddit'
+      POSTGRES_PORT: '5432'
+      REDIS_HOST: 'redisdb'
+    depends_on:
+      - postgresdb
+      - redisdb
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/usr/src
+      - /usr/src/node_modules
+
+  postgresdb:
+    image: postgres
+    volumes:
+      - muneddit-postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: 'admin'
+
+  redisdb:
+    image: redis
+    volumes:
+      - muneddit-redis:/data
+
+volumes:
+  muneddit-postgres:
+    driver: local
+  muneddit-redis:
+    driver: local
