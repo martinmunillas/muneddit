@@ -5,6 +5,7 @@ import { buildSchema } from 'type-graphql';
 import redis from 'redis';
 import session from 'express-session';
 import redisConnect from 'connect-redis';
+import cors from 'cors'
 
 import ormConfig from './mikro-orm.config';
 import { HelloResolver } from './resolvers/hello';
@@ -23,7 +24,10 @@ const main = async () => {
   const redisClient = redis.createClient({
     host: process.env.REDIS_HOST,
   });
-
+  app.use(cors({
+    origin: 'http://localhost:8080',
+    credentials: true
+  }))
   app.use(
     session({
       name: 'qid',
@@ -52,7 +56,9 @@ const main = async () => {
     context: ({req, res}): MyContext => ({ em: orm.em, req, res }),
   });
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: {
+    origin: false
+  } });
 
   app.listen(3000, () => {
     console.log(3000);
