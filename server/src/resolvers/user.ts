@@ -1,8 +1,24 @@
-import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
+import {
+  Arg,
+  Ctx,
+  Field,
+  InputType,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
+} from 'type-graphql';
 import argon2 from 'argon2';
 
 import { MyContext } from '../types';
 import { User } from '../entities/User';
+import {
+  cookieSession,
+  FORGOT_PASSWORD_PREFIX,
+  FRONTEND_URL,
+} from '../constants';
+import { sendEmail } from '../utils/sendEmail';
+import { v4 } from 'uuid';
 
 @InputType()
 class UserInput {
@@ -105,6 +121,36 @@ export class UserResolver {
     return { user };
   }
 
+  @Mutation(() => Boolean)
+  async forgotPassword(
+    @Arg('email') email: string,
+    @Ctx() { em, redis }: MyContext
+  ) {
+    const user = await em.findOne(User, { email });
+
+    if (!user) {
+      return true;
+    }
+
+    const token = v4();
+
+    await redis.set(
+      FORGOT_PASSWORD_PREFIX + token,
+      user.id,
+      'ex',
+      1000 * 60 * 60 * 24 * 3
+    );
+
+    sendEmail(
+      email,
+      'Forgot your password?',
+      `<a href="${FRONTEND_URL}/forgot-password?q=${token}">
+      Reset password
+      </a>`
+    );
+    return true;
+  }
+
   @Query(() => User, { nullable: true })
   async me(@Ctx() { em, req }: MyContext): Promise<User | null> {
     if (!req.session.userId) {
@@ -112,5 +158,20 @@ export class UserResolver {
     }
 
     return await em.findOne(User, { id: req.session.userId });
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext) {
+    return new Promise((resolve) =>
+      req.session.destroy((err) => {
+        res.clearCookie(cookieSession);
+        if (err) {
+          console.log(err);
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      })
+    );
   }
 }

@@ -10,6 +10,7 @@ services:
       POSTGRES_NAME: 'muneddit'
       POSTGRES_PORT: '5432'
       REDIS_HOST: 'redisdb'
+      FRONTEND_URL: 'http://localhost:8080'
     depends_on:
       - postgresdb
       - redisdb

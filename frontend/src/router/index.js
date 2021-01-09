@@ -2,7 +2,6 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 import Home from '../views/Home.vue';
-import store from '../store/index'
 
 Vue.use(VueRouter);
 
@@ -21,6 +20,11 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: () => import('../views/Register.vue'),
+  },
+  {
+    path: '/forgot-password',
+    name: 'Reset Password',
+    component: () => import('../views/ResetPassword.vue'),
   },
 ];
 

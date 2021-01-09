@@ -4,10 +4,20 @@
     <div class="about">
       <form @submit.prevent="register">
         <label for="email">Email</label>
-        <input type="text" name="email" placeholder="Email..." v-model="email" />
+        <input
+          type="text"
+          name="email"
+          placeholder="Email..."
+          v-model="email"
+        />
         <p v-if="errors.email" class="error">{{ errors.email }}</p>
         <label for="password">Password</label>
-        <input type="password" name="password" placeholder="Password..." v-model="password" />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password..."
+          v-model="password"
+        />
         <p v-if="errors.password" class="error">{{ errors.password }}</p>
         <button>Register</button>
       </form>
