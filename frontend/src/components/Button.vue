@@ -1,5 +1,9 @@
 <template>
-  <button :type="type" :class="`button ${color + variant} ${size}`">
+  <button
+    :type="type"
+    :class="`button ${color + variant} ${size}`"
+    @click="click"
+  >
     {{ value }}
   </button>
 </template>
@@ -25,6 +29,10 @@ export default {
     size: {
       required: false,
       default: 'm',
+    },
+    click: {
+      required: false,
+      default: () => {},
     },
   },
 };
@@ -54,6 +62,7 @@ export default {
 .l {
   max-width: 250px;
   padding: 10px 20px;
+  font-size: 25px;
 }
 
 // colors

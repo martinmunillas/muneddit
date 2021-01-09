@@ -1,11 +1,12 @@
 <template>
-  <div class="about">
+  <div class="login">
+    <Button value="✖" :click="closeLogin" class="closeButton" size="l" />
     <img
       src="https://www.redditstatic.com/accountmanager/bbb584033aa89e39bad69436c504c9bd.png"
       alt="reddit"
     />
     <div class="content">
-      <h1 class="login">Login</h1>
+      <h1 class="title">Sign Up</h1>
       <p>By continuing, you agree to our User Agreement and Privacy Policy.</p>
       <form @submit.prevent="register">
         <InputField
@@ -16,24 +17,12 @@
           label="Email"
           :error="errors.email"
         />
-        <InputField
-          type="password"
-          name="password"
-          placeholder="Password..."
-          v-model="password"
-          label="Password"
-          :error="errors.password"
-        />
-        <Button value="Log In" />
+        <Button value="Continue" />
       </form>
       <div class="otherInfo">
         <p>
-          Forgot your <a href="forgot-password" class="password"> password</a> ?
-        </p>
-        <br />
-        <p>
-          New to Reddit?
-          <router-link to="/register" class="signUp"> SIGN UP</router-link>
+          Already a redditor?
+          <router-link to="/register" class="signUp"> LOG IN</router-link>
         </p>
       </div>
     </div>
@@ -59,6 +48,11 @@ export default {
       errors: {},
     };
   },
+  props: {
+    closeLogin: {
+      required: true,
+    },
+  },
   methods: {
     async register() {
       const res = await this.$apollo.mutate({
@@ -79,7 +73,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.about {
+.login {
   display: flex;
   background: #fff;
   border-radius: 4px;
@@ -93,10 +87,18 @@ export default {
   width: 850px;
   z-index: 1;
 
+  .closeButton {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    background-color: transparent;
+    color: grey;
+  }
+
   .content {
     width: 250px;
 
-    .login {
+    .title {
       font-size: 18px;
       font-weight: 500;
       line-height: 22px;
