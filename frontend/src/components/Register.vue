@@ -17,7 +17,7 @@
           label="Email"
           :error="errors.email"
         />
-        <Button value="Continue" />
+        <Button value="Continue" type="submit" />
       </form>
       <div class="otherInfo">
         <p>
@@ -32,7 +32,7 @@
 <script>
 import gql from 'graphql-tag';
 import { mapErrorsToObject } from '../utils/funcs/mapErrorsToObject';
-import { login } from '../graphql/LoginGraphQL';
+import { register } from '../graphql/RegisterGraphQL';
 import InputField from '../components/InputField.vue';
 import Button from '../components/Button.vue';
 
@@ -56,13 +56,13 @@ export default {
   methods: {
     async register() {
       const res = await this.$apollo.mutate({
-        mutation: gql(login),
+        mutation: gql(register),
 
         variables: { email: this.email, password: this.password },
       });
 
-      if (res.data.login.errors) {
-        this.errors = mapErrorsToObject(res.data.login.errors);
+      if (res.data.register.errors) {
+        this.errors = mapErrorsToObject(res.data.register.errors);
       } else {
         this.errors = {};
         window.location.href = '/';

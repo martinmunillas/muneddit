@@ -1,22 +1,31 @@
-import { MikroORM } from '@mikro-orm/core';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import Redis from 'ioredis';
 import session from 'express-session';
 import redisConnect from 'connect-redis';
-import cors from 'cors'
+import cors from 'cors';
+import { createConnection } from 'typeorm';
 
-import ormConfig from './mikro-orm.config';
 import { HelloResolver } from './resolvers/hello';
 import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 import { MyContext } from './types';
 import { cookieSession, __prod__ } from './constants';
-  
+import { Post } from './entities/Post';
+import { User } from './entities/User';
+
 const main = async () => {
-  const orm = await MikroORM.init(ormConfig);
-  await orm.getMigrator().up();
+  const con = await createConnection({
+    host: process.env.POSTGRES_HOST,
+    username: process.env.POSTGRES_USER,
+    password: process.env.POSTGRES_PASSWORD,
+    database: process.env.POSTGRES_NAME || 'muneddit',
+    type: 'postgres',
+    logging: !__prod__,
+    synchronize: !__prod__,
+    entities: [Post, User],
+  });
 
   const app = express();
 
@@ -24,10 +33,14 @@ const main = async () => {
   const redis = new Redis({
     host: process.env.REDIS_HOST,
   });
-  app.use(cors({
-    origin: 'http://localhost:8080',
-    credentials: true
-  }))
+
+  app.use(
+    cors({
+      origin: 'http://localhost:8080',
+      credentials: true,
+    })
+  );
+
   app.use(
     session({
       name: cookieSession,
@@ -37,10 +50,10 @@ const main = async () => {
         disableTouch: true,
       }),
       cookie: {
-        maxAge: 1000 * 60 * 60 *24 * 365 * 10,
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
         httpOnly: true,
         sameSite: 'lax',
-        secure: __prod__
+        secure: __prod__,
       },
       saveUninitialized: false,
       secret: 'nsdjkfgjsdhpupdfv',
@@ -53,12 +66,15 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({req, res}): MyContext => ({ em: orm.em, req, res, redis }),
+    context: ({ req, res }): MyContext => ({ req, res, redis }),
   });
 
-  apolloServer.applyMiddleware({ app, cors: {
-    origin: false
-  } });
+  apolloServer.applyMiddleware({
+    app,
+    cors: {
+      origin: false,
+    },
+  });
 
   app.listen(3000, () => {
     console.log(3000);

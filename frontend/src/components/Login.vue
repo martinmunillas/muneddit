@@ -8,7 +8,7 @@
     <div class="content">
       <h1 class="title">Login</h1>
       <p>By continuing, you agree to our User Agreement and Privacy Policy.</p>
-      <form @submit.prevent="register">
+      <form @submit.prevent="login">
         <InputField
           type="text"
           name="email"
@@ -66,7 +66,7 @@ export default {
     },
   },
   methods: {
-    async register() {
+    async login() {
       const res = await this.$apollo.mutate({
         mutation: gql(login),
 
@@ -104,7 +104,7 @@ export default {
     right: 0px;
     top: 0px;
     background-color: transparent;
-    color: grey
+    color: grey;
   }
 
   .content {

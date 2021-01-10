@@ -32,7 +32,7 @@ export default {
     },
     click: {
       required: false,
-      default: () => {},
+      default: () => [],
     },
   },
 };
