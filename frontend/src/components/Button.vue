@@ -85,4 +85,24 @@ export default {
     color: #2591e4;
   }
 }
+
+.orangeprimary {
+  background: #ff4500;
+  color: #ffffff;
+
+  &:hover {
+    background-color: #fd5b20;
+  }
+}
+
+.orangesecondary {
+  background-color: transparent;
+  border: 1px solid#ff4500;
+  color: #ff4500;
+
+  &:hover {
+    border-color: #fd5b20;
+    color: #fd5b20;
+  }
+}
 </style>

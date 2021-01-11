@@ -16,6 +16,7 @@
           v-model="email"
           label="Email"
           :error="errors.email"
+          :animated="true"
         />
         <InputField
           type="password"
@@ -23,6 +24,7 @@
           placeholder="Password..."
           v-model="password"
           label="Password"
+          :animated="true"
           :error="errors.password"
         />
         <Button value="Log In" />

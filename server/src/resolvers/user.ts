@@ -2,11 +2,13 @@ import {
   Arg,
   Ctx,
   Field,
+  FieldResolver,
   InputType,
   Mutation,
   ObjectType,
   Query,
   Resolver,
+  Root,
 } from 'type-graphql';
 import argon2 from 'argon2';
 
@@ -20,7 +22,12 @@ import {
 import { sendEmail } from '../utils/sendEmail';
 import { v4 } from 'uuid';
 import { generateUsername } from '../utils/generateUsername';
-import { emailIsValid, passwordIsValid } from '../utils/fieldValidators';
+import {
+  emailIsValid,
+  passwordIsValid,
+  usernameIsValid,
+} from '../utils/fieldValidators';
+import { Post } from 'src/entities/Post';
 
 @InputType()
 class UserInput {
@@ -48,8 +55,13 @@ class UserResponse {
   user?: User;
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() { req }: MyContext) {
+    return user.id === req.session.userId ? user.email : '';
+  }
+
   @Mutation(() => UserResponse)
   async register(
     @Arg('options') options: UserInput,

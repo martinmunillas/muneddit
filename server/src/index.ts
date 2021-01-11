@@ -14,6 +14,7 @@ import { MyContext } from './types';
 import { cookieSession, __prod__ } from './constants';
 import { Post } from './entities/Post';
 import { User } from './entities/User';
+import { Updoot } from './entities/Updoot';
 
 const main = async () => {
   const con = await createConnection({
@@ -24,7 +25,7 @@ const main = async () => {
     type: 'postgres',
     logging: !__prod__,
     synchronize: !__prod__,
-    entities: [Post, User],
+    entities: [Post, User, Updoot],
   });
 
   const app = express();

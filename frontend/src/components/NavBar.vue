@@ -21,7 +21,7 @@
 
 <script>
 import gql from 'graphql-tag';
-import { me } from '../graphql/MeGraphQl';
+import { meGQL } from '../graphql/MeGraphQl';
 import { logout as logoutQuery } from '../graphql/LogoutGraphQL';
 import Button from '../components/Button';
 import SearchInput from './SearchInput.vue';
@@ -49,7 +49,7 @@ export default {
     };
   },
   apollo: {
-    me: gql(me),
+    me: gql(meGQL),
   },
   props: {
     msg: String,

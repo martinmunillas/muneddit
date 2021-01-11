@@ -1,4 +1,4 @@
-export const me = `
+export const meGQL = `
 query {
   me {
     username
