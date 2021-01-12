@@ -10,11 +10,27 @@
     </router-link>
     <SearchInput v-model="search" />
     <div class="buttons">
-      <Button value="Log In" variant="secondary" :click="openLogin" />
-      <Button value="Sign Up" :click="openRegister" />
-      <NavUser />
-      <Login v-if="login" :closeLogin="closeLogin" />
-      <Register v-if="register" :closeLogin="closeRegister" />
+      <Button
+        value="Log In"
+        variant="secondary"
+        :click="openLogin"
+        v-if="!me"
+      />
+      <Button value="Sign Up" :click="openRegister" v-if="!me" />
+      <p v-if="me">{{ me.username }}</p>
+      <NavUser :click="toggleUser" v-if="me" />
+
+      <UserOptions v-if="user" />
+      <Login
+        v-if="login"
+        :closeLogin="closeLogin"
+        :toSignUp="fromLoginToRegister"
+      />
+      <Register
+        v-if="register"
+        :closeRegister="closeRegister"
+        :toLogin="fromRegisterToLogin"
+      />
     </div>
   </nav>
 </template>
@@ -29,6 +45,7 @@ import NavUser from './NavUser.vue';
 import Login from './Login.vue';
 import Register from './Register.vue';
 import Overlay from './Overlay.vue';
+import UserOptions from './UserOptions.vue';
 
 export default {
   name: 'NavBar',
@@ -39,6 +56,7 @@ export default {
     Login,
     Register,
     Overlay,
+    UserOptions,
   },
   data() {
     return {
@@ -71,12 +89,26 @@ export default {
       this.register = false;
     },
 
+    toggleUser() {
+      this.user = !this.user;
+    },
+
     async logout() {
       await this.$apollo.mutate({
         mutation: gql(logoutQuery),
       });
 
       window.location.href = '/login';
+    },
+
+    fromRegisterToLogin() {
+      this.register = false;
+      this.login = true;
+    },
+
+    fromLoginToRegister() {
+      this.register = true;
+      this.login = false;
     },
   },
 };
@@ -104,6 +136,7 @@ export default {
 
   .buttons {
     display: flex;
+    align-items: center;
 
     button {
       width: 120px;

@@ -17,7 +17,7 @@ import { User } from './entities/User';
 import { Updoot } from './entities/Updoot';
 
 const main = async () => {
-  const con = await createConnection({
+  await createConnection({
     host: process.env.POSTGRES_HOST,
     username: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,

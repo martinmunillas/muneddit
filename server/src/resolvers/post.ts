@@ -41,7 +41,7 @@ export class PostResolver {
   @Mutation(() => Boolean)
   async vote(
     @Arg('postId', () => Int) postId: number,
-    @Arg('value') value: number,
+    @Arg('value', () => Int) value: number,
     @Ctx() { req }: MyContext
   ) {
     const { userId } = req.session;
@@ -158,24 +158,19 @@ export class PostResolver {
     return Post.create({ ...options, creatorId: req.session.userId }).save();
   }
 
-  @Mutation(() => Post, { nullable: true })
-  async updatePost(
-    @Arg('title', () => String, { nullable: true }) title: string,
-    @Arg('id') id: number
-  ): Promise<Post | null> {
+  @Mutation(() => Boolean, { nullable: true })
+  async deletePost(
+    @Arg('id', () => Int) id: number,
+    @Ctx() { req }: MyContext
+  ): Promise<boolean | null> {
     const post = await Post.findOne(id);
     if (!post) {
       return null;
     }
-    if (typeof title !== 'undefined') {
-      await Post.update({ id }, { title });
+    if (req.session.userId !== post.creatorId) {
+      return null;
     }
-    return post;
-  }
-
-  @Mutation(() => Boolean)
-  async deletePost(@Arg('id') id: number): Promise<boolean> {
-    await Post.delete(id);
+    await Post.delete({});
     return true;
   }
 }

@@ -25,11 +25,29 @@
         </form>
       </div>
       <div v-for="post in posts.posts" :key="post.id" class="post">
-        <RouterLink :to="`/posts/${post.id}`">
+        <div class="votes">
+          <p class="arrow" @click="() => vote(post.id, 'up')">↑</p>
+          <p>{{ post.points }}</p>
+          <p class="arrow" @click="() => vote(post.id, 'down')">↓</p>
+        </div>
+        <div class="postcontent">
           <small>Posted by {{ post.creator.username }} 8 hours ago</small>
-          <h2>{{ post.title }}</h2>
-          <p>{{ post.textSnippet }}...</p>
-        </RouterLink>
+          <RouterLink :to="`/posts/${post.id}`" class="title">
+            <h2>{{ post.title }}</h2>
+          </RouterLink>
+          <p>
+            {{ post.textSnippet }}...<RouterLink :to="`/posts/${post.id}`"
+              >See More</RouterLink
+            >
+          </p>
+        </div>
+        <div v-if="me && post.creator.id === me.id" class="deleteContainer">
+          <Button
+            value="Delete"
+            color="orange"
+            :click="() => deletePost(post.id)"
+          />
+        </div>
       </div>
       <Button
         v-if="posts.hasMore"
@@ -46,6 +64,8 @@ import gql from 'graphql-tag';
 import { postsGQL } from '../graphql/PostsGraphQL';
 import { meGQL } from '../graphql/MeGraphQl';
 import { createPostGQL } from '../graphql/CreatePostGraphQL';
+import { voteGQL } from '../graphql/VoteGraphQL';
+import { deletePostGQL } from '../graphql/DeletePostGraphQL';
 import InputField from '../components/InputField.vue';
 import Button from '../components/Button.vue';
 import Spacer from '../components/Spacer.vue';
@@ -75,7 +95,7 @@ export default {
   methods: {
     async getMorePosts() {
       const res = await this.$apollo.query({
-        mutation: gql(postsGQL),
+        query: gql(postsGQL),
         variables: {
           limit: 10,
           cursor: this.posts.posts[this.posts.posts.length - 1].createdAt,
@@ -93,16 +113,22 @@ export default {
       this.form.title = '';
       this.form.text = '';
 
-      const res = await this.$apollo.update({
-        mutation: gql(postsGQL),
+      document.location.reload();
+    },
+    async deletePost(id) {
+      await this.$apollo.mutate({
+        mutation: gql(deletePostGQL),
+        variables: { id },
+      });
+    },
+    async vote(id, value) {
+      await this.$apollo.mutate({
+        mutation: gql(voteGQL),
         variables: {
-          limit: 10,
-          cursor: this.posts.posts[this.posts.posts.length - 1].createdAt,
+          post: id,
+          value: value === 'up' ? 1 : -1,
         },
       });
-
-      this.posts.posts = [...this.posts.posts, ...res.data.posts.posts];
-      this.posts.hasMore = res.data.posts.hasMore;
     },
   },
 };
@@ -119,7 +145,6 @@ export default {
     border: 1px solid #cccccc;
     border-radius: 4px;
     padding: 20px 10px;
-
     form {
       display: flex;
       flex-direction: column;
@@ -133,21 +158,39 @@ export default {
   }
 
   .post {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    text-align: left;
-
-    background-color: #ffffff;
+    background-color: #fff;
     border: 1px solid #cccccc;
     border-radius: 4px;
+    padding: 20px 10px;
     margin: 20px 0;
-    padding: 10px;
+    display: flex;
 
-    a {
-      color: #222222;
-      text-decoration: none;
+    .votes {
+      margin-right: 10px;
+
+      .arrow {
+        cursor: pointer;
+        margin: 3px 0 6px 0;
+      }
+    }
+
+    .postcontent {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      text-align: left;
+
+      .title {
+        color: #222222;
+        text-decoration: none;
+      }
     }
   }
+}
+
+.deleteContainer {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-end;
 }
 </style>

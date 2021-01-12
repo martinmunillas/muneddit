@@ -7,7 +7,12 @@
     />
     <div class="content">
       <h1 class="title">Login</h1>
-      <p>By continuing, you agree to our User Agreement and Privacy Policy.</p>
+      <p>
+        By continuing, you agree to our
+        <span class="userInfo">User Agreement</span> and
+        <span class="userInfo">Privacy Policy</span>.
+      </p>
+      <Spacer />
       <form @submit.prevent="login">
         <InputField
           type="text"
@@ -18,6 +23,7 @@
           :error="errors.email"
           :animated="true"
         />
+        <Spacer />
         <InputField
           type="password"
           name="password"
@@ -27,16 +33,18 @@
           :animated="true"
           :error="errors.password"
         />
+        <Spacer />
         <Button value="Log In" />
       </form>
       <div class="otherInfo">
+        <Spacer />
         <p>
           Forgot your <a href="forgot-password" class="password"> password</a> ?
         </p>
         <br />
         <p>
           New to Reddit?
-          <router-link to="/register" class="signUp"> SIGN UP</router-link>
+          <span class="signUp" @click="toSignUp"> SIGN UP</span>
         </p>
       </div>
     </div>
@@ -49,11 +57,13 @@ import { mapErrorsToObject } from '../utils/funcs/mapErrorsToObject';
 import { login } from '../graphql/LoginGraphQL';
 import InputField from '../components/InputField.vue';
 import Button from '../components/Button.vue';
+import Spacer from './Spacer.vue';
 
 export default {
   components: {
     InputField,
     Button,
+    Spacer,
   },
   data() {
     return {
@@ -64,6 +74,9 @@ export default {
   },
   props: {
     closeLogin: {
+      required: true,
+    },
+    toSignUp: {
       required: true,
     },
   },
@@ -101,6 +114,11 @@ export default {
   width: 850px;
   z-index: 1;
 
+  .userInfo {
+    color: #0079d3;
+    cursor: pointer;
+  }
+
   .closeButton {
     position: absolute;
     right: 0px;
@@ -111,6 +129,11 @@ export default {
 
   .content {
     width: 250px;
+    padding: 50px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
 
     .title {
       font-size: 18px;
@@ -133,6 +156,7 @@ export default {
       .signUp {
         color: #0079d3;
         font-weight: 600;
+        cursor: pointer;
       }
     }
   }

@@ -1,14 +1,19 @@
 <template>
   <div class="login">
-    <Button value="✖" :click="closeLogin" class="closeButton" size="l" />
+    <Button value="✖" :click="closeRegister" class="closeButton" size="l" />
     <img
       src="https://www.redditstatic.com/accountmanager/bbb584033aa89e39bad69436c504c9bd.png"
       alt="reddit"
     />
     <div class="content">
       <h1 class="title">Sign Up</h1>
-      <p>By continuing, you agree to our User Agreement and Privacy Policy.</p>
+      <p>
+        By continuing, you agree to our
+        <span class="userInfo">User Agreement</span> and
+        <span class="userInfo">Privacy Policy</span>.
+      </p>
       <form @submit.prevent="register">
+        <Spacer />
         <InputField
           type="text"
           name="email"
@@ -17,12 +22,32 @@
           label="Email"
           :error="errors.email"
         />
-        <Button value="Continue" type="submit" />
+        <Spacer />
+        <InputField
+          type="password"
+          name="password"
+          placeholder="Password..."
+          v-model="password"
+          label="Password"
+          :error="errors.password"
+        />
+        <Spacer />
+        <InputField
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password..."
+          v-model="confirmPassword"
+          label="Confirm Password"
+          :error="errors.confirmPassword"
+        />
+        <Spacer />
+        <Button value="Sign Up" type="submit" />
       </form>
       <div class="otherInfo">
+        <Spacer />
         <p>
           Already a redditor?
-          <router-link to="/register" class="signUp"> LOG IN</router-link>
+          <span @click="toLogin" class="signUp"> LOG IN</span>
         </p>
       </div>
     </div>
@@ -35,26 +60,36 @@ import { mapErrorsToObject } from '../utils/funcs/mapErrorsToObject';
 import { register } from '../graphql/RegisterGraphQL';
 import InputField from '../components/InputField.vue';
 import Button from '../components/Button.vue';
+import Spacer from './Spacer.vue';
 
 export default {
   components: {
     InputField,
     Button,
+    Spacer,
   },
   data() {
     return {
       email: '',
       password: '',
+      confirmPassword: '',
       errors: {},
     };
   },
   props: {
-    closeLogin: {
+    closeRegister: {
+      required: true,
+    },
+    toLogin: {
       required: true,
     },
   },
   methods: {
     async register() {
+      if (this.password !== this.confirmPassword) {
+        this.errors = { confirmPassword: 'Passwords should match' };
+        return;
+      }
       const res = await this.$apollo.mutate({
         mutation: gql(register),
 
@@ -87,6 +122,11 @@ export default {
   width: 850px;
   z-index: 1;
 
+  .userInfo {
+    color: #0079d3;
+    cursor: pointer;
+  }
+
   .closeButton {
     position: absolute;
     right: 0px;
@@ -97,6 +137,11 @@ export default {
 
   .content {
     width: 250px;
+    padding: 50px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
 
     .title {
       font-size: 18px;
@@ -119,6 +164,7 @@ export default {
       .signUp {
         color: #0079d3;
         font-weight: 600;
+        cursor: pointer;
       }
     }
   }

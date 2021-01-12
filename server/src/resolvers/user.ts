@@ -25,9 +25,7 @@ import { generateUsername } from '../utils/generateUsername';
 import {
   emailIsValid,
   passwordIsValid,
-  usernameIsValid,
 } from '../utils/fieldValidators';
-import { Post } from 'src/entities/Post';
 
 @InputType()
 class UserInput {

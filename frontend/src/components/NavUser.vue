@@ -1,5 +1,5 @@
 <template>
-  <div class="navUser">
+  <div class="navUser" @click="click">
     <svg
       viewBox="0 0 250 250"
       xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +24,11 @@
 </template>
 
 <script>
-export default {};
+export default {
+  props: {
+    click: { required: false },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
